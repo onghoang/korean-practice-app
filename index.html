@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ôn tiếng Hàn EPS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #eef5ff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    header {
+      margin-bottom: 20px;
+    }
+    .avatar {
+      width: 100px;
+      border-radius: 50%;
+      border: 3px solid #007bff;
+    }
+    .logo {
+      width: 60px;
+      margin-top: 10px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      margin: auto;
+      width: 350px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .word { font-size: 28px; color: #111; }
+    .roman { font-size: 18px; color: #555; }
+    .meaning { font-size: 22px; color: green; margin-bottom: 10px; }
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    .quiz {
+      margin-top: 25px;
+      background: #fff7cc;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .quiz-option {
+      display: block;
+      margin: 4px auto;
+      padding: 8px;
+      width: 80%;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="avatar.jpg" alt="avatar" class="avatar"><br>
+    <img src="logo.jpg" alt="logo" class="logo">
+    <h2>Thầy Hoàng - Ôn luyện tiếng Hàn EPS</h2>
+  </header>
+
+  <div class="card">
+    <div class="word" id="word">일하다</div>
+    <div class="roman" id="roman">il-ha-da</div>
+    <div class="meaning" id="meaning">làm việc</div>
+    <input type="checkbox" id="learned" onchange="markLearned()"> Tôi đã thuộc<br>
+    <button onclick="playAudio()">🔊 Nghe</button>
+    <button onclick="showNext()">➡️ Từ tiếp</button>
+    <button onclick="autoPlay()">⏩ Tự động</button>
+  </div>
+
+  <div class="quiz">
+    <div class="quiz-question" id="quiz-question">Câu hỏi?</div>
+    <div id="quiz-options"></div>
+    <button onclick="loadQuiz()">🎲 Trắc nghiệm vui</button>
+  </div>
+
+  <audio id="audio"></audio>
+
+  <script>
+    const words = [
+      { word: "일하다", roman: "il-ha-da", meaning: "làm việc", audio: "https://dict.naver.com/audio/ilhada.mp3" },
+      { word: "공장", roman: "gong-jang", meaning: "nhà máy", audio: "https://dict.naver.com/audio/gongjang.mp3" },
+      { word: "음식", roman: "eum-sik", meaning: "thức ăn", audio: "https://dict.naver.com/audio/eumsik.mp3" },
+      { word: "공부하다", roman: "gong-bu-ha-da", meaning: "học tập", audio: "https://dict.naver.com/audio/gongbuhada.mp3" },
+      { word: "병원", roman: "byeong-won", meaning: "bệnh viện", audio: "https://dict.naver.com/audio/byeongwon.mp3" }
+    ];
+
+    const quizList = [
+      { question: "'일하다' nghĩa là gì?", options: ["ăn", "ngủ", "làm việc", "đi học"], answer: "làm việc" },
+      { question: "'공장' là gì?", options: ["nhà máy", "bệnh viện", "trường học", "siêu thị"], answer: "nhà máy" },
+      { question: "Từ nào là 'thức ăn'?", options: ["병원", "음식", "일하다", "공부하다"], answer: "음식" }
+    ];
+
+    let index = 0;
+    let autoplay = false;
+
+    function showNext() {
+      index = (index + 1) % words.length;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const word = words[index];
+      document.getElementById("word").innerText = word.word;
+      document.getElementById("roman").innerText = word.roman;
+      document.getElementById("meaning").innerText = word.meaning;
+      document.getElementById("learned").checked = false;
+    }
+
+    function markLearned() {
+      if (document.getElementById("learned").checked) {
+        alert("✅ Tốt lắm!");
+      }
+    }
+
+    function playAudio() {
+      const audio = document.getElementById("audio");
+      audio.src = words[index].audio;
+      audio.play();
+    }
+
+    function autoPlay() {
+      autoplay = true;
+      index = -1;
+      nextAuto();
+    }
+
+    function nextAuto() {
+      if (!autoplay) return;
+      index++;
+      if (index >= words.length) {
+        autoplay = false;
+        alert("✅ Xong hết rồi!");
+        return;
+      }
+      updateDisplay();
+      const audio = document.getElementById("audio");
+      audio.src = words[index].audio;
+      audio.play();
+      audio.onended = nextAuto;
+    }
+
+    function loadQuiz() {
+      const q = quizList[Math.floor(Math.random() * quizList.length)];
+      document.getElementById("quiz-question").innerText = q.question;
+      document.getElementById("quiz-options").innerHTML = q.options.map(opt =>
+        `<button class='quiz-option' onclick="checkAnswer('${opt}', '${q.answer}')">${opt}</button>`
+      ).join('');
+    }
+
+    function checkAnswer(selected, correct) {
+      alert(selected === correct ? "✅ Đúng rồi!" : "❌ Sai! Đúng là: " + correct);
+    }
+  </script>
+</body>
+</html>
